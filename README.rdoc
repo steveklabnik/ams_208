@@ -18,6 +18,22 @@ Basically,
 
 This doesn't work. Flip the comments, and it does. This is a bug.
 
+You can find this code in the Blorgh repo, app/serializers/blorgh_serializer.rb
+
+You can get an entry by spinning up a server,
+
+    $ bin/rails s
+
+hitting the right page
+
+    $ open http://localhost:3000/blog/posts/new
+
+Filling out the form, then hitting create. It should redirect you to
+
+    http://localhost:3000/blog/posts/1
+
+Which should give you the serialized json.
+
 If I make a change to Rails:
 
 diff --git a/actionpack/lib/action_controller/railtie.rb b/actionpack/lib/action_controller/railtie.rb
