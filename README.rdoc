@@ -1,28 +1,39 @@
 == README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+This is intended to reproduce https://github.com/rails-api/active_model_serializers/issues/208
 
-Things you may want to cover:
+You'll also need to grab https://github.com/steveklabnik/blorgh
 
-* Ruby version
+Finally, you'll need to change Gemfile references in both the app and the
+engine to point at your own copy of rails and blorgh, rather than mine.
 
-* System dependencies
+=== The issue
 
-* Configuration
+Basically, 
 
-* Database creation
+    def utt_url
+      app.routes.url_helpers.root_path
+      #Blorgh::Engine.routes.url_helpers.root_path
+    end
 
-* Database initialization
+This doesn't work. Flip the comments, and it does. This is a bug.
 
-* How to run the test suite
+If I make a change to Rails:
 
-* Services (job queues, cache servers, search engines, etc.)
+diff --git a/actionpack/lib/action_controller/railtie.rb b/actionpack/lib/action_controller/railtie.rb
+index 5379547..831c007 100644
+--- a/actionpack/lib/action_controller/railtie.rb
++++ b/actionpack/lib/action_controller/railtie.rb
+@@ -43,8 +43,9 @@ module ActionController
+       options.relative_url_root ||= app.config.relative_url_root
+ 
+       ActiveSupport.on_load(:action_controller) do
+-        include app.routes.mounted_helpers
++        include AbstractController::UrlFor
+         extend ::AbstractController::Railties::RoutesHelpers.with(app.routes)
++        include app.routes.mounted_helpers
+         extend ::ActionController::Railties::Helpers
+ 
+         options.each do |k,v|
 
-* Deployment instructions
-
-* ...
-
-
-Please feel free to use a different markup language if you do not plan to run
-<tt>rake doc:app</tt>.
+It still doesn't actually fix things. Drat.
